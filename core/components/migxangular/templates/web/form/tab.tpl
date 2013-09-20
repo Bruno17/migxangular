@@ -1,3 +1,3 @@
 
-<li><a href="[[~[[+request.resource_id]]]]#tabs-[[+id]]">[[+category]]</a></li>
+<li><a href="[[+request.original_request_uri]]#tabs-[[+id]]">[[+category]]</a></li>
 

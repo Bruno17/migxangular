@@ -850,7 +850,7 @@ class MigxAngular {
         //print_r(array_keys($this->customconfigs));
 
         //$controller->setPlaceholder('i18n', $this->migxi18n);
-        
+
         $controller->setPlaceholder('tv_id', $tv_id);
         $controller->setPlaceholder('migx_lang', $this->modx->toJSON($this->migxlang));
         $controller->setPlaceholder('properties', $properties);
@@ -1027,7 +1027,7 @@ class MigxAngular {
     }
 
 
-    function createForm(&$tabs, &$record, &$allfields, &$categories, $scriptProperties, &$xtypes, &$data) {
+    function createForm(&$tabs, &$record, &$allfields, &$categories, $scriptProperties, &$xtypes, &$data, &$controllerscripts) {
 
         $fieldid = 0;
         $tabid = 1;
@@ -1043,7 +1043,7 @@ class MigxAngular {
                     /*generate unique tvid, must be numeric*/
                     /*todo: find a better solution*/
                     $field['tv_id'] = ($scriptProperties['tv_id'] . '99' . $fieldid) * 1;
-                    
+
                     if (isset($field['description_is_code']) && !empty($field['description_is_code'])) {
                         $tv = $this->modx->newObject('modTemplateVar');
                         $tv->set('description', $this->renderChunk($field['description'], $record, false, false));
@@ -1079,13 +1079,15 @@ class MigxAngular {
                         $fieldvalue = '';
                         if (isset($record[$field['field']])) {
                             $fieldvalue = $record[$field['field']];
+                                                                                    
                             if (is_array($fieldvalue)) {
                                 $fieldvalue = is_array($fieldvalue[0]) ? $this->modx->toJson($fieldvalue) : implode('||', $fieldvalue);
                             }
                         }
 
 
-                        $tv->set('value', $fieldvalue);
+                        $tv->set('value', (string) $fieldvalue);
+                        
                         if (!empty($field['caption'])) {
                             $field['caption'] = htmlentities($field['caption'], ENT_QUOTES, $this->modx->getOption('modx_charset'));
                             $tv->set('caption', $field['caption']);
@@ -1114,7 +1116,7 @@ class MigxAngular {
                         $tv->set('inherited', true);
                         }
                         */
-
+ 
                         if ($tv->get('value') == null) {
                             $v = $tv->get('default_text');
                             if ($tv->get('type') == 'checkbox' && $tv->get('value') == '') {
@@ -1122,6 +1124,8 @@ class MigxAngular {
                             }
                             $tv->set('value', $v);
                         }
+                        
+                      
 
 
                         //$this->modx->smarty->assign('tv', $tv);
@@ -1169,15 +1173,53 @@ class MigxAngular {
 
                         //print_r($inputRenderPaths);
 
+
                         $inputRenderPaths = $this->config['corePath'] . 'elements/tv/input/';
                         $inputRenderPaths = explode(',', $inputRenderPaths);
+                        $type = $tv->get('type');
+                        $method = 'input';
+                        if ($className = $tv->checkForRegisteredRenderMethod($type, $method)) {
+
+                        } else {
+                            $typefound = false;
+
+                            foreach ($inputRenderPaths as $path) {
+                                $renderFile = $path . $type . '.class.php';
+                                if (file_exists($renderFile)) {
+                                    $className = include $renderFile;
+
+                                    $tv->registerRenderMethod($type, $method, $className);
+                                    if (class_exists($className)) {
+                                        /**
+                                         *  *  *  * @var modTemplateVarOutputRender $render */
+                                        $typefound = true;
+                                    }
+                                    break;
+                                }
+                            }
+                            if (!$typefound) {
+                                $tv->set('type', 'text');
+                            }
+                        }
+
                         $inputForm = $tv->getRender($params, $value, $inputRenderPaths, 'input', null, $tv->get('type'));
+
                         $this->modx->getParser();
                         /*parse all non-cacheable tags and remove unprocessed tags, if you want to parse only cacheable tags set param 3 as false*/
                         $this->modx->parser->processElementTags('', $inputForm, true, true, '[[', ']]', array(), $counts);
                         //echo '<input type="hidden" id="original' . $_REQUEST['win_id'] . '-' . $tv->get('id') . '" name="original' . $tv->get('id') . '" value="' . htmlspecialchars($tv->get('value'), ENT_QUOTES) . '" />';
-                        
+
+                        //extract script, must be at the end of file and start with '<script>'
+                        $parts = explode('<script>', $inputForm);
+                        $inputForm = $parts[0];
+                        //remove closing '</script>'
+                        if (isset($parts[1])) {
+                            $controllerscripts[] = str_replace('</script>', '', $parts[1]);
+                        }
+
+
                         $data[$field['field']] = $tv->get('value');
+                        
 
                         if (is_array($xtypes)) {
                             $xtype = $tv->get('xtype_template');
@@ -1203,7 +1245,7 @@ class MigxAngular {
             }
 
             $cat = array();
-            
+
             $cat['category'] = $tab['caption'];
             $cat['print_before_tabs'] = isset($tab['print_before_tabs']) && !empty($tab['print_before_tabs']) ? true : false;
             $cat['id'] = $tabid;
@@ -1244,7 +1286,7 @@ class MigxAngular {
 
         if ($className = $tv->checkForRegisteredRenderMethod($type, $method)) {
             /**
-             *  *  *  * @var modTemplateVarOutputRender $render */
+             *  *  *  *  *  *  *  * @var modTemplateVarOutputRender $render */
 
             $render = new $className($tv);
             $output = $render->render($value, $params);
@@ -1261,7 +1303,7 @@ class MigxAngular {
                     $this->registerRenderMethod($type, $method, $className);
                     if (class_exists($className)) {
                         /**
-                         *  *  *  * @var modTemplateVarOutputRender $render */
+                         *  *  *  *  *  *  *  * @var modTemplateVarOutputRender $render */
                         $render = new $className($tv);
                     }
                     break;
@@ -1338,14 +1380,14 @@ class MigxAngular {
     function parseChunk($tpl, $fields = array(), $getChunk = true, $printIfemty = true) {
 
         $output = '';
-        
+
         if ($getChunk) {
             if ($chunk = $this->modx->getObject('modChunk', array('name' => $tpl), true)) {
                 $tpl = $chunk->getContent();
             } elseif (file_exists($tpl)) {
                 $tpl = file_get_contents($tpl);
             } elseif (file_exists($this->modx->getOption('base_path') . $tpl)) {
-                
+
                 $tpl = file_get_contents($this->modx->getOption('base_path') . $tpl);
             } else {
                 $tpl = false;

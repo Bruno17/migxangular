@@ -1,3 +1,21 @@
-.ui-dialog-content {
-    -moz-box-sizing: content-box;
+
+.livesearchitems {
+    
+}
+
+.livesearchitem-content {
+    border: 1px solid #DDDDDD;
+    padding: 10px;   
+}
+
+.livesearchitem-content.active{
+    background-color: #EFEFEF;
+}
+
+.livesearchitem {
+    
+}
+
+.datetimepicker {
+    width: 230px;
 }

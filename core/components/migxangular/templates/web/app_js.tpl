@@ -13,12 +13,13 @@ migxAngular.factory('Config', function() {
         url: 'assets/components/migxangular/connector.php',
         migxurl: 'assets/components/migx/connector.php',
         baseParams: {
-            'HTTP_MODAUTH': '[[+auth]]'
+            'HTTP_MODAUTH': '[[+auth]]',
+            'original_request_uri' : '[[+request_uri]]'
         },
     }
 });
 /*
-code taken from here:
+initial code taken from here:
 http://stackoverflow.com/questions/18078233/angularjs-nested-modal-dialogs
 */
 migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) {
@@ -36,6 +37,7 @@ migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) 
     
     service.loadDialog = function(scope, Config, params, dialogOptions) {
         //loading the formtabs + datas
+        
         var ajaxConfig = service.prepareFormParams(Config, params);
         $http(ajaxConfig).success(function(response, status, header, config) {
             scope.data = response.data;
@@ -46,7 +48,8 @@ migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) 
     };
     
     service.prepareFormParams = function(Config, params) {
-        var params = angular.extend(Config.baseParams, params);
+        var baseParams = angular.copy(Config.baseParams);
+        var params = angular.extend(baseParams, params);
         params.dialogCounter = globals.dialogCounter;
         var ajaxConfig = {
             url: Config.url,
@@ -60,7 +63,8 @@ migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) 
     };
     
     service.preparePostParams = function(Config, params) {
-        var params = angular.extend(Config.baseParams, params);
+        var baseParams = angular.copy(Config.baseParams);
+        var params = angular.extend(baseParams, params);
         params.dialogCounter = globals.dialogCounter;
         var ajaxConfig = {
             url: Config.migxurl,
@@ -96,7 +100,14 @@ migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) 
             autoOpen: false,
             modal: true,
             title: params.win_title,
-            width: 600
+            width: 900,
+            maxHeight: 800,
+            position: {
+                my: 'top+100',
+                at: 'top',
+                of: '#ma-maintoolbar'
+            }
+            
 /*         ,buttons: [{
                 text: 'Ok',
                 'ng-click': 'onButtonClick({"configs":"test","object_id":"5","resource_id":"5","wctx":"web","field":"feld","action":"web/migxdb/fields","processaction":""})'  
@@ -138,21 +149,10 @@ function toolbarCtrl($scope, $http, Config, UiDialog) {
         UiDialog.loadDialog($scope, Config, params, dialogOptions);
         
     }
+    
+    [[+customhandlers]]    
 }
 
-function FirstCtrl($scope, Data) {
-    $scope.data = Data;
-    $scope.nl2br = function(input) {
-        return input.replace(/\n/g, '<br/>');
-    };
-}
-
-function SecondCtrl($scope, Data) {
-    $scope.data = Data;
-    $scope.reversedMessage = function() {
-        return $scope.data.message.split("").reverse().join("");
-    };
-}
 migxAngular.directive('maTabs', function() {
     return {
         restrict: 'A',

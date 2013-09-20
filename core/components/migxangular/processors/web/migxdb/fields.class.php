@@ -15,15 +15,14 @@ class migxFormProcessor extends modProcessor {
         //require_once dirname(dirname(dirname(__file__))) . '/model/migx/migx.class.php';
         //$migx = new Migx($this->modx);
         $modx = &$this->modx;
-        
+
         $corePath = dirname(dirname(dirname(dirname(__file__)))) . '/';
         require_once $corePath . 'model/chunkie/chunkie.class.inc.php';
         //require_once $modx->getOption('core_path') . 'model/modx/modtemplatevar.class.php';
         require_once $corePath . '/model/migxangular/modtemplatevarinputrendermigxangular.class.php';
         $template = '@FILE form.tpl';
         $controller = new migxangularChunkie($template, $corePath . 'templates/web/form/');
-        
-       
+
 
         $scriptProperties = $this->getProperties();
 
@@ -56,8 +55,7 @@ class migxFormProcessor extends modProcessor {
 
             //$_REQUEST['id']=$scriptProperties['resource_id'];
         }
-        
-        
+
 
         //$controller->setPlaceholder('_config', $this->modx->config);
         $task = $this->modx->migxangular->getTask();
@@ -72,13 +70,13 @@ class migxFormProcessor extends modProcessor {
 
         $this->modx->migxangular->loadConfigs(true, true, $scriptProperties, $sender);
         $tabs = $this->modx->migxangular->getTabs();
-        
-       
+
         $fieldid = 0;
         $allfields[] = array();
         $categories = array();
         $xtypes = array();
         $data = array();
+        $controllerscripts = array();
 
         $template = '@FILE fields.tpl';
         $this->modx->controller = new migxangularChunkie($template, $corePath . 'templates/web/form/');
@@ -88,8 +86,8 @@ class migxFormProcessor extends modProcessor {
         //$this->modx->controller = new MigxFormController($this->modx);
         //$this->modx->controller->loadTemplatesPath();
         $this->modx->controller->setPlaceholder('_config', $this->modx->config);
-        
-        $this->modx->migxangular->createForm($tabs, $record, $allfields, $categories, $scriptProperties, $xtypes, $data);
+
+        $this->modx->migxangular->createForm($tabs, $record, $allfields, $categories, $scriptProperties, $xtypes, $data, $controllerscripts);
 
         $formcaption = $this->modx->migxangular->customconfigs['formcaption'];
 
@@ -112,7 +110,7 @@ class migxFormProcessor extends modProcessor {
                 $parser->setPlaceholder('is_xtab', $is_xtab);
                 //print_r($parser->getPlaceholders());
                 $tabsoutput[] = $parser->render();
-                
+
                 $template = '@FILE tab_content.tpl';
                 $parser = new migxangularChunkie($template, $corePath . 'templates/web/form/');
                 $parser->createVars($category);
@@ -120,31 +118,53 @@ class migxFormProcessor extends modProcessor {
                 $is_xtab = count($categories) < 2 || ($i == 1 && $category['print_before_tabs']) ? '0' : '1';
                 $parser->setPlaceholder('is_xtab', $is_xtab);
                 //print_r($parser->getPlaceholders());
-                $tabscontents[] = $parser->render();                
+                $tabscontents[] = $parser->render();
             }
         }
 
         $innerrows['tab'] = implode('', $tabsoutput);
         $innercounts['tab'] = count($categories);
         $innerrows['tab_content'] = implode('', $tabscontents);
-        $innercounts['tab_content'] = count($categories);        
+        $innercounts['tab_content'] = count($categories);
 
         $formcaption = $this->modx->migxangular->renderChunk($formcaption, $record, false, false);
         $formcaption = addslashes($formcaption);
         $formcaption = str_replace(array("\n", "\r"), array("\\n", "\\r"), $formcaption);
 
         $o_array = array();
-        
+
         if ($object) {
             $o_array = $object->toArray();
         }
-        
+
         $o_array['id'] = empty($o_array['id']) ? 'new' : $o_array['id'];
+
+        //add formbuttons
+       
+        $formbuttons = '[{"button":"cancel"},{"button":"doneandclose"}]';
+        $formbuttons = $this->modx->getOption('winbuttons', $this->modx->migxangular->customconfigs, $formbuttons);        
+        $formbuttons = $this->modx->fromJson($formbuttons);
+        $winbuttons = array();
         
-        $template = '@FILE winbuttons.tpl';
-        $parser = new migxangularChunkie($template, $corePath . 'templates/web/form/');
-        $parser->createVars($controller->getPlaceholders());
-        $winbuttons = $parser->render();
+
+        foreach ($formbuttons as $button) {
+            $template = '@FILE ' . $button['button'] . '.tpl';
+            $parser = new migxangularChunkie($template, $corePath . 'templates/web/form/buttons/');
+            $parser->createVars($controller->getPlaceholders());
+            $winbutton = $parser->render();
+            //extract script, must be at the end of file and start with '<script>'
+            $winbutton = explode('<script>',$winbutton);
+            $winbuttons[] = $winbutton[0];
+            //remove closing '</script>'
+            if (isset($winbutton[1])){
+                $controllerscripts[] = str_replace('</script>','',$winbutton[1]);
+            }
+        }
+        
+        $innerrows['button'] = implode('', $winbuttons);
+        $innercounts['button'] = count($winbuttons);
+        $innerrows['controller_scripts'] = implode('', $controllerscripts);
+        $innercounts['controller_scripts'] = count($controllerscripts);        
 
         $controller->setPlaceholder('xtypes', $xtypesoutput);
         $controller->setPlaceholder('formcaption', $formcaption);
@@ -179,15 +199,16 @@ class migxFormProcessor extends modProcessor {
             $controller->setPlaceholder('showCheckbox', 1);
         }
 
-        //echo '<pre>' .print_r($controller->getPlaceholders(),1) .'</pre>';
+        
 
         $output['html'] = $controller->render();
+        //$output['html'] .= '<pre>' .print_r($controller->getPlaceholders(),1) .'</pre>';
         //$this->modx->getParser();
         /*parse all non-cacheable tags and remove unprocessed tags, if you want to parse only cacheable tags set param 3 as false*/
         //$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $counts);
 
         $output['data'] = $data;
-        
+
         return $this->modx->toJson($output);
 
     }

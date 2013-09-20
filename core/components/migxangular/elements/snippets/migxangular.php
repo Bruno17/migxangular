@@ -18,6 +18,8 @@ if (!empty($buttons)) {
     $buttons = array(array('configs' => 'childstutorial', 'text' => 'Edit Resource ' . $modx->resource->get('id')));
 }
 
+
+
 $buttonsoutput = array();
 if (!empty($buttons)) {
     if (is_array($buttons)) {
@@ -54,6 +56,7 @@ $properties['buttons'] = implode('', $buttonsoutput);
 $properties['auth'] = $_SESSION["modx.mgr.user.token"];
 $properties['resource_id'] = $modx->resource->get('id');
 $properties['wctx'] = $modx->getOption('wctx', $scriptProperties, $modx->resource->get('context_key'));
+$properties['request_uri'] = $_SERVER["REQUEST_URI"];
 
 /*
 $properties['buttons']= '
@@ -106,11 +109,22 @@ $modx->regClientStartupScript('http://code.jquery.com/jquery-1.9.1.js');
 $modx->regClientStartupScript('http://code.jquery.com/ui/1.10.3/jquery-ui.js');
 
 
-$modx->regClientStartupScript('assets/components/migxangular/js/angular.js');
+$modx->regClientStartupScript('assets/components/courtreservation/js/jquery-ui/i18n/jquery.ui.datepicker-de.js');
+
+
+//$modx->regClientStartupScript('assets/components/migxangular/js/angular.js');
+$modx->regClientStartupScript('https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js');
+$modx->regClientStartupScript('http://code.angularjs.org/1.2.0rc1/angular-animate.min.js');
+
+
+
 $modx->regClientStartupScript('assets/components/migxangular/js/sprintf.js');
+$modx->regClientStartupScript('assets/components/migxangular/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js');
+
 
 $modx->regClientCSS('assets/components/migxangular/bootstrap-3.0.0/css/bootstrap.custom.css');
-//$modx->regClientCSS('assets/components/migxangular/css/migxangular.css');
+$modx->regClientCSS('assets/components/migxangular/js/bootstrap-datetimepicker/css/datetimepicker.css');
+$modx->regClientCSS('assets/components/migxangular/css/migxangular.css');
 
 //$modx->regClientCSS('assets/components/migxangular/ui-bootstrap/css/bootstrap.min.css');
 //$modx->regClientCSS('assets/components/migxangular/ui-bootstrap/css/jquery-ui-1.10.3.custom.css');
@@ -125,5 +139,8 @@ $script = $migxangular->parseChunk($scriptPath, $properties);
 $script = '<script type="text/javascript" charset="utf-8">' . $script . '</script>';
 
 $modx->regClientStartupScript($script);
+//directives
+//$modx->regClientStartupScript('assets/components/migxangular/js/directives/typeahead.js');
+$modx->regClientStartupScript('assets/components/migxangular/js/directives/datetimepicker.js');
 
 return $toolbar;
