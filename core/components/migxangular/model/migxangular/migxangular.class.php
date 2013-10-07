@@ -101,6 +101,44 @@ class MigxAngular {
         }
     }
 
+    function createParser($template, $path, &$filenames) {
+        $config = $this->customconfigs;
+        $packageName = $this->modx->getOption('packageName', $config);
+
+        require_once $this->config['corePath'] . 'model/chunkie/chunkie.class.inc.php';
+        $defaultroot = $this->config['corePath'] . 'templates/' . $path;
+        $customroot = '';
+        if (!empty($packageName)) {
+            $customroot = $this->modx->getOption('core_path') . 'components/' . $packageName . '/' . 'migxangulartemplates/' . $path;
+        }
+
+        if ($fullpath = $this->findCustomFilePath($template, $path, $defaultroot, $customroot, $filenames)) {
+            $template = '@FILE ' . $template;
+            return new migxangularChunkie($template, $corePath . $fullpath);
+        }
+
+        return false;
+    }
+
+    function findCustomFilePath($filename, $path, $defaultroot, $customroot, &$filenames) {
+        if (!empty($customroot)) {
+            $filepath = $customroot . $filename;
+            $filenames[] = $filepath;
+            if (file_exists($filepath)) {
+                return $customroot;
+            }
+        }
+
+        $filepath = $defaultroot . $filename;
+        $filenames[] = $filepath;
+        if (file_exists($filepath)) {
+            return $defaultroot;
+        }
+
+        return false;
+
+    }
+
     function findProcessor($processorspath, $filename, &$filenames) {
         return $this->findCustomFile($processorspath, $filename, $filenames);
     }
@@ -1079,15 +1117,15 @@ class MigxAngular {
                         $fieldvalue = '';
                         if (isset($record[$field['field']])) {
                             $fieldvalue = $record[$field['field']];
-                                                                                    
+
                             if (is_array($fieldvalue)) {
                                 $fieldvalue = is_array($fieldvalue[0]) ? $this->modx->toJson($fieldvalue) : implode('||', $fieldvalue);
                             }
                         }
 
 
-                        $tv->set('value', (string) $fieldvalue);
-                        
+                        $tv->set('value', (string )$fieldvalue);
+
                         if (!empty($field['caption'])) {
                             $field['caption'] = htmlentities($field['caption'], ENT_QUOTES, $this->modx->getOption('modx_charset'));
                             $tv->set('caption', $field['caption']);
@@ -1116,7 +1154,7 @@ class MigxAngular {
                         $tv->set('inherited', true);
                         }
                         */
- 
+
                         if ($tv->get('value') == null) {
                             $v = $tv->get('default_text');
                             if ($tv->get('type') == 'checkbox' && $tv->get('value') == '') {
@@ -1124,8 +1162,6 @@ class MigxAngular {
                             }
                             $tv->set('value', $v);
                         }
-                        
-                      
 
 
                         //$this->modx->smarty->assign('tv', $tv);
@@ -1173,9 +1209,17 @@ class MigxAngular {
 
                         //print_r($inputRenderPaths);
 
-
+                        $config = $this->customconfigs;
+                        $packageName = $this->modx->getOption('packageName', $config);
                         $inputRenderPaths = $this->config['corePath'] . 'elements/tv/input/';
                         $inputRenderPaths = explode(',', $inputRenderPaths);
+                        if (!empty($packageName)) {
+                            $customPaths = array();
+                            $custompath = $this->modx->getOption('core_path') . 'components/' . $packageName . '/' . 'elements/migxangular/tv/input/';
+                            $customPaths[] = $custompath;
+                            $inputRenderPaths = array_merge($customPaths,$inputRenderPaths);
+                        }
+                        
                         $type = $tv->get('type');
                         $method = 'input';
                         if ($className = $tv->checkForRegisteredRenderMethod($type, $method)) {
@@ -1191,7 +1235,7 @@ class MigxAngular {
                                     $tv->registerRenderMethod($type, $method, $className);
                                     if (class_exists($className)) {
                                         /**
-                                         *  *  *  * @var modTemplateVarOutputRender $render */
+                                         *  *  *  *  *  *  *  * @var modTemplateVarOutputRender $render */
                                         $typefound = true;
                                     }
                                     break;
@@ -1219,7 +1263,7 @@ class MigxAngular {
 
 
                         $data[$field['field']] = $tv->get('value');
-                        
+
 
                         if (is_array($xtypes)) {
                             $xtype = $tv->get('xtype_template');
@@ -1286,7 +1330,7 @@ class MigxAngular {
 
         if ($className = $tv->checkForRegisteredRenderMethod($type, $method)) {
             /**
-             *  *  *  *  *  *  *  * @var modTemplateVarOutputRender $render */
+             *  *  *  *  *  *  *  *  *  *  *  * @var modTemplateVarOutputRender $render */
 
             $render = new $className($tv);
             $output = $render->render($value, $params);
@@ -1303,7 +1347,7 @@ class MigxAngular {
                     $this->registerRenderMethod($type, $method, $className);
                     if (class_exists($className)) {
                         /**
-                         *  *  *  *  *  *  *  * @var modTemplateVarOutputRender $render */
+                         *  *  *  *  *  *  *  *  *  *  *  * @var modTemplateVarOutputRender $render */
                         $render = new $className($tv);
                     }
                     break;

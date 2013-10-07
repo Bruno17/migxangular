@@ -24,6 +24,15 @@ $buttonsoutput = array();
 if (!empty($buttons)) {
     if (is_array($buttons)) {
         foreach ($buttons as $button) {
+            $permission = $modx->getOption('permission', $button, '');
+            if (!empty($permission)){
+                if ($modx->hasPermission($permission)){
+                    
+                }else{
+                    continue;
+                }
+            } 
+            
             $prop['extraparams'] = '';
             $extraparams = $modx->getOption('extraparams', $button, '');
             if (is_array($extraparams) && count($extraparams) > 0) {
@@ -117,7 +126,7 @@ $modx->regClientStartupScript('https://ajax.googleapis.com/ajax/libs/angularjs/1
 $modx->regClientStartupScript('http://code.angularjs.org/1.2.0rc1/angular-animate.min.js');
 
 
-
+$modx->regClientStartupScript('assets/components/migxangular/js/sanitize.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/sprintf.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js');
 

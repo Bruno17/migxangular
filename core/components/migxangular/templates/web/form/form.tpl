@@ -28,7 +28,7 @@
 
 <script type="text/javascript">
 
-function formCtrl[[+request.dialogCounter]]($scope, $timeout, $http, $rootScope, $filter, Config, UiDialog){
+function formCtrl[[+request.dialogCounter]]($scope, $timeout, $http, $sanitize, $rootScope, $filter, Config, UiDialog){
 
     [[+innerrows.controller_scripts]]
     

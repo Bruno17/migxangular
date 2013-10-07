@@ -1,5 +1,0 @@
-Changelog for MIGXangular
-
-MIGXangular 1.0.0
----------------------------------
-Initial Version

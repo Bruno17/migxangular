@@ -19,15 +19,16 @@ abstract class modTemplateVarRenderMigxFe {
 
     function __construct(modTemplateVar $tv, array $config = array()) {
 
-        $corePath = dirname(dirname(dirname(__file__))) . '/';
+        
         $this->tv = &$tv;
         $this->modx = &$tv->xpdo;
         $this->config = array_merge($this->config, $config);
         $template = $this->getTemplate();
+        $templatesRoot = $this->getTemplateRoot();
 
         $xtype_template = str_replace('.tpl', '.xtype.tpl', $template);
-        $this->tv->set('xtype_template', $corePath . 'templates/' . $xtype_template);
-        $this->controller = new migxangularChunkie('@FILE ' . $template, $corePath . 'templates/');
+        $this->tv->set('xtype_template', $templatesRoot . $xtype_template);
+        $this->controller = new migxangularChunkie('@FILE ' . $template, $templatesRoot);
         $this->setReplaceonlyfields('tv.value');
 
     }
@@ -82,6 +83,15 @@ abstract class modTemplateVarRenderMigxFe {
     public function process($value, array $params = array()) {
         return $value;
     }
+
+    /**
+     * Return the template path to load
+     * @return string
+     */
+    public function getTemplateRoot() {
+        return dirname(dirname(dirname(__file__))) . '/templates/';
+    }    
+
 }
 /**
  * An abstract class for extending Input Renders for TVs.
@@ -133,6 +143,7 @@ abstract class modTemplateVarInputRenderMigxFe extends modTemplateVarRenderMigxF
     public function getTemplate() {
         return '';
     }
+    
 
     /**
      * Return additional scripts for the TV

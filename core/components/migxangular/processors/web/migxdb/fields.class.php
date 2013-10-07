@@ -148,10 +148,18 @@ class migxFormProcessor extends modProcessor {
         
 
         foreach ($formbuttons as $button) {
-            $template = '@FILE ' . $button['button'] . '.tpl';
-            $parser = new migxangularChunkie($template, $corePath . 'templates/web/form/buttons/');
-            $parser->createVars($controller->getPlaceholders());
-            $winbutton = $parser->render();
+            //$template = '@FILE ' . $button['button'] . '.tpl';
+            //$parser = new migxangularChunkie($template, $corePath . 'templates/web/form/buttons/');
+            
+            $template = $button['button'] . '.tpl';
+            $path = 'web/form/buttons/';
+            $filenames = array(); 
+            $winbutton = '';           
+            if ($parser = $this->modx->migxangular->createParser($template, $path, $filenames)){
+                $parser->createVars($controller->getPlaceholders());
+                $winbutton = $parser->render();                
+            }
+
             //extract script, must be at the end of file and start with '<script>'
             $winbutton = explode('<script>',$winbutton);
             $winbuttons[] = $winbutton[0];

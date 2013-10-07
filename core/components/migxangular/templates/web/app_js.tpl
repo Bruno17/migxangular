@@ -1,8 +1,9 @@
-var migxAngular = angular.module('migxAngular', []);
+var migxAngular = angular.module('migxAngular', ['ngSanitize']);
 var globals = {
     timeoutInMs: 5000,
     dialogCounter: 0
 };
+
 migxAngular.filter('nl2br', function() {
     return function(input) {
         return input.replace(/\n/g, '<br/>');
@@ -15,7 +16,7 @@ migxAngular.factory('Config', function() {
         baseParams: {
             'HTTP_MODAUTH': '[[+auth]]',
             'original_request_uri' : '[[+request_uri]]'
-        },
+        }
     }
 });
 /*
@@ -131,6 +132,87 @@ migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) 
             alert("Timed-out waiting for data from server...");
         }
     };
+          service.generatePages = function(currentPage, totalItems, pageSize, config) {
+            var maxBlocks, maxPage, maxPivotPages, minPage, numPages, pages;
+            var config = config || {};
+            var maxBlocks = config.maxBlocks || 11;
+            var showFirst = config.showFirst;
+            var showLast = config.showLast;
+                        
+            pages = [];
+            numPages = Math.ceil(totalItems / pageSize);
+            if (numPages > 1) {
+              if (showFirst){
+                pages.push({
+                  type: "first",
+                  number: 1,
+                  start: 0,
+                  label: "",
+                  active: currentPage > 1
+                });                
+              }
+              number = Math.max(1, currentPage - 1);
+              pages.push({
+                type: "prev",
+                number: number,
+                label: "&laquo;",
+                active: currentPage > 1,
+                start: (number-1) * pageSize,
+                btn_class: 'btn-default'
+              });
+              maxPivotPages = Math.round((maxBlocks - 5) / 2);
+              minPage = Math.max(1, currentPage - maxPivotPages);
+              maxPage = Math.min(numPages, currentPage + maxPivotPages * 2 - (currentPage - minPage));
+              minPage = Math.max(1, minPage - (maxPivotPages * 2 - (maxPage - minPage)));
+              i = minPage;
+              while (i <= maxPage) {
+                if (currentPage == i){
+                    btn_class = 'btn-danger';
+                }else{
+                    btn_class = 'btn-default';
+                }
+                
+                if ((i === minPage && i !== 1) || (i === maxPage && i !== numPages)) {
+                  pages.push({
+                    type: "more",
+                    label: "...",
+                    number: 0,
+                    btn_class: 'btn-default'
+                  });
+                } else {
+                  pages.push({
+                    type: "page",
+                    number: i,
+                    start: (i-1) * pageSize,
+                    label: "<span>" + i +"</span>",
+                    active: currentPage !== i,
+                    btn_class: btn_class
+                  });
+                }
+                i++;
+              }
+              number = Math.min(numPages, currentPage + 1)
+              pages.push({
+                type: "next",
+                number: number,
+                start: (number-1) * pageSize,
+                label: "&raquo;",
+                active: currentPage < numPages,
+                btn_class: 'btn-default'
+              });
+              if (showLast){
+                pages.push({
+                  type: "last",
+                  number: numPages,
+                  start: (numPages-1) * pageSize,
+                  label: "",
+                  active: currentPage !== numPages
+                });
+              }              
+            }
+            return pages;
+          };    
+    
     return service;
 }]);
 
