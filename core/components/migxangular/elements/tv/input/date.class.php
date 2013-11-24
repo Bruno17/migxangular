@@ -25,6 +25,10 @@ class modTemplateVarInputRenderDate extends modTemplateVarInputRenderMigxFe {
         }
         $this->setPlaceholder('params',$params);
         $this->setPlaceholder('tv',$this->tv->toArray());
+        
+        
+        
+        
     }
     public function getTemplate() {
         return 'element/tv/renders/input/date.tpl';

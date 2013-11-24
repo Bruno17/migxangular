@@ -124,12 +124,14 @@ $modx->regClientStartupScript('assets/components/courtreservation/js/jquery-ui/i
 //$modx->regClientStartupScript('assets/components/migxangular/js/angular.js');
 $modx->regClientStartupScript('https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js');
 $modx->regClientStartupScript('http://code.angularjs.org/1.2.0rc1/angular-animate.min.js');
-
+$modx->regClientStartupScript('http://code.angularjs.org/1.2.0rc1/angular-route.js');
 
 $modx->regClientStartupScript('assets/components/migxangular/js/sanitize.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/sprintf.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js');
+$modx->regClientStartupScript('assets/components/migxangular/bootstrap-3.0.0/js/bootstrap.min.js');
 
+$modx->regClientStartupScript('assets/components/migxangular/js/ngekathuwa/services/ekathuwa-modal.js');
 
 $modx->regClientCSS('assets/components/migxangular/bootstrap-3.0.0/css/bootstrap.custom.css');
 $modx->regClientCSS('assets/components/migxangular/js/bootstrap-datetimepicker/css/datetimepicker.css');

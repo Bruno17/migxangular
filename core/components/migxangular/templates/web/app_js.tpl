@@ -1,6 +1,6 @@
-var migxAngular = angular.module('migxAngular', ['ngSanitize']);
+var migxAngular = angular.module('migxAngular', ['ngSanitize','ngEkathuwa']);
 var globals = {
-    timeoutInMs: 5000,
+    timeoutInMs: 10000,
     dialogCounter: 0
 };
 
@@ -12,6 +12,7 @@ migxAngular.filter('nl2br', function() {
 migxAngular.factory('Config', function() {
     return {
         url: 'assets/components/migxangular/connector.php',
+        //url: '75/angularajax.php',
         migxurl: 'assets/components/migx/connector.php',
         baseParams: {
             'HTTP_MODAUTH': '[[+auth]]',
@@ -23,26 +24,71 @@ migxAngular.factory('Config', function() {
 initial code taken from here:
 http://stackoverflow.com/questions/18078233/angularjs-nested-modal-dialogs
 */
-migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) {
+migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope' , function($http, $compile, $ekathuwa, $rootScope) {
     
     //$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
     
     var service = {};
     
-    service.loadChildDialog = function(parentscope, Config, params, rootScope, dialogOptions) {
-        var scope = rootScope.$new();
+    service.loadChildDialog = function(parentscope, Config, params, dialogOptions, postData) {
+        var scope = $rootScope.$new();
         scope.parentdatas = angular.copy(parentscope.parentdatas || []);
         scope.parentdatas.push(parentscope.data);
-        service.loadDialog(scope, Config, params, dialogOptions);
+        service.loadModal(scope, Config, params, dialogOptions, postData);
     };
+    
+    service.loadModal = function(scope, Config, params, dialogOptions, postData){
+        //loading the formtabs + datas
+        dialogOptions.id = dialogOptions.id || "Basic";
+        params.modal_id = dialogOptions.id;
+        
+        if (postData){
+            var ajaxConfig = service.preparePostParams(Config, params);
+            ajaxConfig.url = Config.url;
+            ajaxConfig.data = postData;
+        }else{
+            var ajaxConfig = service.prepareFormParams(Config, params);
+        }
+        
+        $http(ajaxConfig).success(function(response, status, header, config) {
+            scope.data = response.data;
+            service.showModal(scope, response, params, dialogOptions);
+        }).error(function(data, status, header, config) {
+            
+            service.error(data, status, header, config);
+        });      
+    }
+    
+    service.hideModal = function(modal_id){
+        
+        var id = "ekathuwaModal" + modal_id;
+        var dialog = $('#' + id + ' .modal');
+        dialog.on('hidden.bs.modal', function () {
+            //console.log('hidden');
+        })
+
+        //console.log('beforehide');
+        dialog.modal('hide');
+        //console.log('afterhide');        
+    }
+    
+    service.showModal = function(scope, response, params, dialogOptions, callback){
+ 
+        var modalId = dialogOptions.id || "BasicId" ;
+        dialogOptions.id = "ekathuwaModal" + modalId;
+        dialogOptions.templateHTML = dialogOptions.templateHTML || response.html ;
+        dialogOptions.scope = scope;
+        dialogOptions.contentPreSize = dialogOptions.contentPreSize || "lg" //df,sm,md,lg,fl;
+        $ekathuwa.modal(dialogOptions);           
+    }    
     
     service.loadDialog = function(scope, Config, params, dialogOptions) {
         //loading the formtabs + datas
-        
         var ajaxConfig = service.prepareFormParams(Config, params);
         $http(ajaxConfig).success(function(response, status, header, config) {
             scope.data = response.data;
-            service.showDialog(scope, response, params, dialogOptions);
+            
+            service.showModal(scope, response, params, dialogOptions);
         }).error(function(data, status, header, config) {
             service.error(data, status, header, config);
         });
@@ -124,12 +170,12 @@ migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) 
     service.error = function(data, status, header, config) {
         document.body.style.cursor = 'default';
         if (status == 406) {
-            console.log("Received 406 for:" + header + " # " + config);
+            //console.log("Received 406 for:" + header + " # " + config);
             alert("Received 406 from web service...");
         } else {
-            console.log("Status:" + status);
-            console.dir(config);
-            alert("Timed-out waiting for data from server...");
+            //console.log("Status:" + status);
+            //console.dir(config);
+            alert("Timed-out waiting for data from server... test" );
         }
     };
           service.generatePages = function(currentPage, totalItems, pageSize, config) {
@@ -216,9 +262,10 @@ migxAngular.factory('UiDialog', ['$http', '$compile', function($http, $compile) 
     return service;
 }]);
 
-function toolbarCtrl($scope, $http, Config, UiDialog) {
+function toolbarCtrl($scope, $http, $ekathuwa, Config, UiDialog) {
     $scope.config = Config;
     $scope.onButtonClick = function(params) {
+        
         var dialogOptions = {
             callback: function() {
                 if (dialogOptions.result !== undefined) {
@@ -228,7 +275,7 @@ function toolbarCtrl($scope, $http, Config, UiDialog) {
             result: {}
         };
         
-        UiDialog.loadDialog($scope, Config, params, dialogOptions);
+        UiDialog.loadModal($scope, Config, params, dialogOptions);
         
     }
     

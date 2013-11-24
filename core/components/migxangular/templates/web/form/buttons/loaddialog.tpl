@@ -1,6 +1,6 @@
 
-<button type="button" ng-click = "onLoadButtonClick({'configs':'childstutorial','object_id':'5','resource_id':'106','wctx':'web','field':'feld','action':'web/migxdb/fields','processaction':''})" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
-<span class="ui-button-text">Load Child Dialog</span>
+<button type="button" ng-click = "onLoadButtonClick({'configs':'childstutorial','object_id':'5','resource_id':'106','wctx':'web','field':'feld','action':'web/migxdb/fields','processaction':''})" class="btn btn-default" role="button" aria-disabled="false">
+Load Child Dialog
 </button>
 
 <script>
@@ -14,7 +14,7 @@
             result: {}
         };
         
-        UiDialog.loadChildDialog($scope, Config, params, $rootScope, dialogOptions);   
+        UiDialog.loadChildDialog($scope, Config, params, dialogOptions);   
 
     }    
 </script>

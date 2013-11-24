@@ -1,13 +1,10 @@
 
-<button type="button" ng-click = "onCancelButtonClick()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
-<span class="ui-button-text">Cancel</span>
+<button type="button" ng-click = "onCancelButtonClick()"  class="btn btn-default" role="button" aria-disabled="false">
+[[%cancel]]
 </button>
 
 <script>
     $scope.onCancelButtonClick = function(config) {
-        console.log($scope);
-        console.log(config);
-        var dialog = $scope.dialogOptions.jquiDialog;
-        dialog.dialog('close');
+        UiDialog.hideModal('[[+request.modal_id]]');
     }
 </script>

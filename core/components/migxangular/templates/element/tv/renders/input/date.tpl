@@ -5,7 +5,7 @@
 
     <div class="input-group">
         <span class="input-group-addon glyphicon glyphicon-calendar"></span>
-        <input type="text" id="tv[[+tv.id]]" class="form-control" ng-model="data.[[+tv.fieldname]]" datetimepicker />
+        <input type="text" id="tv[[+tv.id]]" class="form-control" ng-model="data.[[+tv.fieldname]]" [[+maxview]] datetimepicker />
         <span class="input-group-addon glyphicon glyphicon-question-sign"></span>
     </div>
 

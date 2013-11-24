@@ -1081,7 +1081,7 @@ class MigxAngular {
                     /*generate unique tvid, must be numeric*/
                     /*todo: find a better solution*/
                     $field['tv_id'] = ($scriptProperties['tv_id'] . '99' . $fieldid) * 1;
-
+                    
                     if (isset($field['description_is_code']) && !empty($field['description_is_code'])) {
                         $tv = $this->modx->newObject('modTemplateVar');
                         $tv->set('description', $this->renderChunk($field['description'], $record, false, false));
@@ -1101,8 +1101,9 @@ class MigxAngular {
                         if (!empty($field['inputOptionValues'])) {
                             $tv->set('elements', $field['inputOptionValues']);
                         }
-                        if (!empty($field['default'])) {
-                            $tv->set('default_text', $tv->processBindings($field['default']));
+                        $tv->set('default_text', (string) $tv->processBindings($field['default']));
+                        if ($field['default'] === '0' || !empty($field['default'])) {
+                          
                         }
                         if (!empty($field['configs'])) {
                             $cfg = $this->modx->fromJson($field['configs']);
