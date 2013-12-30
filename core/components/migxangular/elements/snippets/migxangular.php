@@ -122,9 +122,9 @@ $modx->regClientStartupScript('assets/components/courtreservation/js/jquery-ui/i
 
 
 //$modx->regClientStartupScript('assets/components/migxangular/js/angular.js');
-$modx->regClientStartupScript('https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js');
-$modx->regClientStartupScript('http://code.angularjs.org/1.2.0rc1/angular-animate.min.js');
-$modx->regClientStartupScript('http://code.angularjs.org/1.2.0rc1/angular-route.js');
+$modx->regClientStartupScript('https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js');
+$modx->regClientStartupScript('http://code.angularjs.org/1.2.6/angular-animate.min.js');
+$modx->regClientStartupScript('http://code.angularjs.org/1.2.6/angular-route.js');
 
 $modx->regClientStartupScript('assets/components/migxangular/js/sanitize.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/sprintf.js');

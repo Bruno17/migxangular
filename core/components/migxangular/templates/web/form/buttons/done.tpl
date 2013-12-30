@@ -6,8 +6,6 @@
 <script>
 
     $scope.onDoneButtonClick = function(params) {
-        console.log($scope.data);
-        var dialog = $scope.dialogOptions.jquiDialog;
         var cfg = Config;
         cfg.method = 'POST';
         var ajaxConfig = UiDialog.preparePostParams(cfg, params);
@@ -16,8 +14,7 @@
         };
         $http(ajaxConfig).success(function(response, status, header, config) {
             if (params.closeonsuccess){
-                var dialog = $scope.dialogOptions.jquiDialog;
-                dialog.dialog('close');                
+                UiDialog.hideModal('[[+request.modal_id]]');
             }
         }).error(function(data, status, header, config) {
             UiDialog.error(data, status, header, config);
