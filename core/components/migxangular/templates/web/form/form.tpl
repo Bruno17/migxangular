@@ -39,7 +39,7 @@
 
 <script type="text/javascript">
 
-function formCtrl[[+request.modal_id]]($scope, $ekathuwa, $timeout, $http, $sanitize, $rootScope, $filter, Config, UiDialog){
+function formCtrl[[+request.modal_id]]($scope, $compile, $sce, $ekathuwa, $timeout, $http, $sanitize, $rootScope, $filter, Config, UiDialog){
 
     [[+innerrows.controller_scripts]]
     

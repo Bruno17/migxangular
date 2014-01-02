@@ -326,7 +326,7 @@ class MigxAngular {
             }
 
             foreach ($configs as $config) {
-
+                
                 if ($cfObject = $this->modx->getObject('migxConfig', array('name' => $config, 'deleted' => '0'))) {
 
                     $extended = $cfObject->get('extended');
@@ -563,6 +563,8 @@ class MigxAngular {
 
         $this->loadConfigs(false);
         //$lang = $this->modx->lexicon->fetch();
+        
+        
 
         $resource = is_object($this->modx->resource) ? $this->modx->resource->toArray() : array();
         $this->config['resource_id'] = $this->modx->getOption('id', $resource, '');
@@ -769,7 +771,7 @@ class MigxAngular {
             }
         }
         $this->customconfigs['gridcolumnbuttons'] = $columnbuttons;
-
+        
         $gridfunctions = array();
 
         $default_formtabs = '[{"caption":"Default", "fields": [{"field":"title","caption":"Title"}]}]';

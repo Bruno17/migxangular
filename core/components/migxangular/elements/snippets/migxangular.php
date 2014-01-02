@@ -153,5 +153,6 @@ $modx->regClientStartupScript($script);
 //directives
 //$modx->regClientStartupScript('assets/components/migxangular/js/directives/typeahead.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/directives/datetimepicker.js');
+$modx->regClientStartupScript('assets/components/migxangular/js/directives/sortable.js');
 
 return $toolbar;

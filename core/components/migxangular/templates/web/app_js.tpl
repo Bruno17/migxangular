@@ -1,4 +1,4 @@
-var migxAngular = angular.module('migxAngular', ['ngSanitize','ngEkathuwa']);
+var migxAngular = angular.module('migxAngular', ['ngSanitize','ngEkathuwa','ui.sortable']);
 var globals = {
     timeoutInMs: 10000,
     dialogCounter: 0
@@ -32,6 +32,7 @@ migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope'
     
     service.loadChildDialog = function(parentscope, Config, params, dialogOptions, postData) {
         var scope = $rootScope.$new();
+        scope.parentscope = parentscope;
         scope.parentdatas = angular.copy(parentscope.parentdatas || []);
         scope.parentdatas.push(parentscope.data);
         service.loadModal(scope, Config, params, dialogOptions, postData);
@@ -262,7 +263,7 @@ migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope'
     return service;
 }]);
 
-function toolbarCtrl($scope, $http, $ekathuwa, Config, UiDialog) {
+function toolbarCtrl($scope, $http, $sce, $ekathuwa, Config, UiDialog) {
     $scope.config = Config;
     $scope.onButtonClick = function(params) {
         
