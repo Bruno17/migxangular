@@ -28,10 +28,10 @@ class modTemplateVarInputRenderListbox extends modTemplateVarInputRenderMigxFe {
         $this->setPlaceholder('dbvalue', $value);
         $this->setPlaceholder('inputoptions', $this->modx->toJson($items));
         $this->setPlaceholder('opts', $items);
-        $this->setReplaceonlyfields('tv.value,dbvalue,inputoptions');
+        $this->setReplaceonlyfields('tv.value,dbvalue,inputoptionsx');
     }
     
-
+    
     
 }
 return 'modTemplateVarInputRenderListbox';

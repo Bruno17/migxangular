@@ -118,7 +118,7 @@ $modx->regClientStartupScript('http://code.jquery.com/jquery-1.9.1.js');
 $modx->regClientStartupScript('http://code.jquery.com/ui/1.10.3/jquery-ui.js');
 
 
-$modx->regClientStartupScript('assets/components/courtreservation/js/jquery-ui/i18n/jquery.ui.datepicker-de.js');
+//$modx->regClientStartupScript('assets/components/courtreservation/js/jquery-ui/i18n/jquery.ui.datepicker-de.js');
 
 
 //$modx->regClientStartupScript('assets/components/migxangular/js/angular.js');
@@ -130,10 +130,13 @@ $modx->regClientStartupScript('assets/components/migxangular/js/sanitize.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/sprintf.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js');
 $modx->regClientStartupScript('assets/components/migxangular/bootstrap-3.0.0/js/bootstrap.min.js');
+//$modx->regClientStartupScript('//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js');
 
 $modx->regClientStartupScript('assets/components/migxangular/js/ngekathuwa/services/ekathuwa-modal.js');
 
 $modx->regClientCSS('assets/components/migxangular/bootstrap-3.0.0/css/bootstrap.custom.css');
+//$modx->regClientCSS('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css');
+
 $modx->regClientCSS('assets/components/migxangular/js/bootstrap-datetimepicker/css/datetimepicker.css');
 $modx->regClientCSS('assets/components/migxangular/css/migxangular.css');
 

@@ -16,13 +16,13 @@
 <br />
 </div>
 
-
 </div>
 
 <script>
 
     $scope.options = $scope.options || {};
-    $scope.options.[[+tv.fieldname]] = angular.fromJson('[[+inputoptions]]');
+    $scope.options.[[+tv.fieldname]] = [[+inputoptions]];
+    //$scope.options.[[+tv.fieldname]] = [];
     
     $scope.getselected[[+tv.fieldname]] = function () {
         return $filter('filter')($scope.options.[[+tv.fieldname]], {checked: true});
@@ -38,7 +38,5 @@
         $scope.data.[[+tv.fieldname]] = items;  
 
     };
-    
-  
 
 </script>

@@ -146,7 +146,9 @@ class migxFormProcessor extends modProcessor {
         $formbuttons = $this->modx->fromJson($formbuttons);
         $winbuttons = array();
         
-
+        $controller->setPlaceholder('request', $_REQUEST);
+        $controller->setPlaceholder('win_id', isset($this->modx->migxangular->customconfigs['win_id']) ? $this->modx->migxangular->customconfigs['win_id'] : $scriptProperties['tv_id']);
+        
         foreach ($formbuttons as $button) {
             //$template = '@FILE ' . $button['button'] . '.tpl';
             //$parser = new migxangularChunkie($template, $corePath . 'templates/web/form/buttons/');
@@ -178,16 +180,15 @@ class migxFormProcessor extends modProcessor {
         $controller->setPlaceholder('formcaption', $formcaption);
         $controller->setPlaceholder('fields', $this->modx->toJSON($allfields));
         $controller->setPlaceholder('customconfigs', $this->modx->migxangular->customconfigs);
-        $controller->setPlaceholder('object', $o_array);
+        
         $controller->setPlaceholder('innerrows', $innerrows);
         $controller->setPlaceholder('innercounts', $innercounts);
-        $controller->setPlaceholder('request', $_REQUEST);
         $controller->setPlaceholder('migxangularconfig', $this->modx->migxangular->config);
         $controller->setPlaceholder('OnMigxfeFormPrerender', '');
         $controller->setPlaceholder('OnMigxfeFormRender', '');
 
         //$controller->setPlaceholder('win_id', $scriptProperties['tv_id']);
-        $controller->setPlaceholder('win_id', isset($this->modx->migxangular->customconfigs['win_id']) ? $this->modx->migxangular->customconfigs['win_id'] : $scriptProperties['tv_id']);
+        
         //$c->setPlaceholder('id_update_window', 'modx-window-midb-grid-update');
         $controller->setPlaceholder('onsubmitsuccess', $this->modx->getOption('onsubmitsuccess', $this->modx->migxangular->customconfigs, ''));
         $controller->setPlaceholder('winbuttons', $this->modx->getOption('winbuttons', $this->modx->migxangular->customconfigs, $winbuttons));

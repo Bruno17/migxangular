@@ -277,12 +277,12 @@ class MigxAngular {
             //$configs = array_merge( array ('master'), $configs);
 
             if ($grid) {
-                $configFile = $this->config['migxCorePath'] . 'configs/grid/grid.config.inc.php'; // [ file ]
+                $configFile = $this->config['corePath'] . 'configs/grid/grid.config.inc.php'; // [ file ]
                 if (file_exists($configFile)) {
                     include ($configFile);
                 }
                 //custom collection of grid-functions...... - deprecated
-                $configFile = $this->config['migxCorePath'] . 'configs/grid/grid.custom.config.inc.php'; // [ file ]
+                $configFile = $this->config['corePath'] . 'configs/grid/grid.custom.config.inc.php'; // [ file ]
                 if (file_exists($configFile)) {
                     include ($configFile);
                 }
@@ -305,7 +305,7 @@ class MigxAngular {
             if ($preloadGridConfigs && is_Object($this->configsObject)) {
 
                 $config = $this->configsObject->get('name');
-                $configFile = $this->config['migxCorePath'] . 'configs/grid/grid.' . $config . '.config.inc.php'; // [ file ]
+                $configFile = $this->config['corePath'] . 'configs/grid/grid.' . $config . '.config.inc.php'; // [ file ]
                 if (file_exists($configFile)) {
                     include ($configFile);
                 }
@@ -581,6 +581,13 @@ class MigxAngular {
         $tv_id = empty($tv_id) && isset($properties['tv_id']) ? $properties['tv_id'] : $tv_id;
 
         $this->config['tv_id'] = $tv_id;
+        
+        foreach ($this->modx->config as $key => $value){
+            if (!is_array($value)) {
+                $replace['modx_config_' . $key] = $value;
+                $search['modx_config_' . $key] = '[[+_config.' . $key . ']]';
+            }            
+        }
 
         foreach ($this->config as $key => $value) {
             if (!is_array($value)) {
@@ -879,7 +886,7 @@ class MigxAngular {
                 }
             }
             if (count($gridfunctions) > 0) {
-                $gf = ',' . str_replace($search, $replace, implode(',', $gridfunctions));
+                $gf = str_replace($search, $replace, implode('', $gridfunctions));
             }
         }
 
@@ -891,6 +898,7 @@ class MigxAngular {
 
         //$controller->setPlaceholder('i18n', $this->migxi18n);
 
+        $controller->setPlaceholder('_config', $this->modx->config);
         $controller->setPlaceholder('tv_id', $tv_id);
         $controller->setPlaceholder('migx_lang', $this->modx->toJSON($this->migxlang));
         $controller->setPlaceholder('properties', $properties);
@@ -1079,6 +1087,13 @@ class MigxAngular {
             if (is_array($fields) && count($fields) > 0) {
 
                 foreach ($fields as &$field) {
+                    if (isset($field['restrictive_condition'])) {
+                        $props = $record;
+                        $rc = $this->renderChunk($field['restrictive_condition'], $props, false, false);
+                        if (!empty($rc)){
+                            continue;                           
+                        }
+                    }                    
                     $fieldid++;
                     /*generate unique tvid, must be numeric*/
                     /*todo: find a better solution*/

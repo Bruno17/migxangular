@@ -1,4 +1,8 @@
 
+#ma-maintoolbar {
+    text-align: left;
+}
+
 .livesearchitems {
     
 }
@@ -19,3 +23,8 @@
 .datetimepicker {
     width: 230px;
 }
+
+.modal-dialog {
+    text-align: left;
+}
+

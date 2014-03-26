@@ -228,14 +228,14 @@
         var cell = null;
         var i = 0;
         for(i = 0; i < columns.length; i++){
-            cell = $scope.renderCell[[+tv.fieldname]](item,columns[i]);
+            cell = $scope.renderCell[[+tv.fieldname]](item,columns[i],i);
             cells.push(cell);     
         }
         
         return cells;    
     }
     
-    $scope.renderCell[[+tv.fieldname]] = function(item,column){
+    $scope.renderCell[[+tv.fieldname]] = function(item,column,colIndex){
         var fieldname = '[[+tv.fieldname]]';
         var dataIndex = column.dataIndex;
         var value = item[dataIndex] || '';
@@ -251,7 +251,7 @@
             var fn = eval(handler);
             //fn = fn.createDelegate(this);
             if (typeof (fn) == 'function'){
-               html = fn(value,item); 
+               html = fn(value,item,colIndex); 
             }
         }
        
@@ -269,20 +269,22 @@
         var i = 0;
         //var buttons = [];
         var buttons = '<h3 class="main-column">' + v + '</h3>'; 
-        buttons += '<ul class="actions">';
+        //buttons += '<ul class="actions">';
         var button = null;
         for(i = 0; i < m.length; i++){
             button = m[i];
             if (typeof (button.className) != 'undefined' && typeof (button.handler) != 'undefined'){
                 //button.handler = button.handler.replace('.this', '');
                 //buttons.push(button); 
-                buttons += '<li> <button ng-click="onClick[[+tv.fieldname]]()" class="controlBtn ' + button.className + ' ' + button.handler + '" >' + button.text + '</button>  </li> ';                   
+                buttons += '<button type="button" class="controlBtn ' + button.className + ' ' + button.handler + ' btn btn-default" >' + button.text + '</button>  ';                   
             }            
         }
         
-        buttons += '</ul>';
+        //buttons += '</ul>';
         return buttons;
-	}     
+	}
+    
+    [[+customconfigs.gridfunctions]]    
     
     
     $scope.columns = $scope.columns || {};

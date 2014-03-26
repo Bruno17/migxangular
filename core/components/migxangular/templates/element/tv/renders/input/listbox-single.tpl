@@ -10,6 +10,6 @@
 <script>
 
     $scope.options = $scope.options || {};
-    $scope.options.[[+tv.fieldname]] = angular.fromJson('[[+inputoptions]]');
+    $scope.options.[[+tv.fieldname]] = [[+inputoptions]];
 
 </script>

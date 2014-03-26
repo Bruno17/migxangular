@@ -30,6 +30,32 @@ migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope'
     
     var service = {};
     
+    service.showPleaseWait = function() {
+        //service.pleaseWaitDiv.modal();
+    var wait =  '';
+        wait += '<div class="progress progress-striped active">';
+        wait += '<div class="progress-bar"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">';
+        wait += '<span class="sr-only">Processing</span>';
+        wait += '</div>';
+        wait += '</div>';
+
+        var dialogOptions = {
+            id : 'PleaseWait',
+            headerText : 'Processing...',
+            bodyTemplate : wait,
+            contentPreSize : 'sm',
+            footer : false    
+        }
+        
+        var response = {};
+        var scope = $rootScope.$new();            
+        service.showModal(scope, response, null, dialogOptions)
+    };
+    
+    service.hidePleaseWait = function () {
+        service.hideModal('PleaseWait');
+    };
+
     service.loadChildDialog = function(parentscope, Config, params, dialogOptions, postData) {
         var scope = $rootScope.$new();
         scope.parentscope = parentscope;
@@ -40,6 +66,8 @@ migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope'
     
     service.loadModal = function(scope, Config, params, dialogOptions, postData){
         //loading the formtabs + datas
+        service.showPleaseWait();
+        
         dialogOptions.id = dialogOptions.id || "Basic";
         params.modal_id = dialogOptions.id;
         
@@ -53,9 +81,10 @@ migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope'
         
         $http(ajaxConfig).success(function(response, status, header, config) {
             scope.data = response.data;
+            service.hidePleaseWait();
             service.showModal(scope, response, params, dialogOptions);
         }).error(function(data, status, header, config) {
-            
+            service.hidePleaseWait();
             service.error(data, status, header, config);
         });      
     }
@@ -77,13 +106,14 @@ migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope'
  
         var modalId = dialogOptions.id || "BasicId" ;
         dialogOptions.id = "ekathuwaModal" + modalId;
-        dialogOptions.templateHTML = dialogOptions.templateHTML || response.html ;
+        dialogOptions.templateHTML = dialogOptions.templateHTML || response.html || null ;
         dialogOptions.scope = scope;
         dialogOptions.contentPreSize = dialogOptions.contentPreSize || "lg" //df,sm,md,lg,fl;
         $ekathuwa.modal(dialogOptions);           
     }    
     
     service.loadDialog = function(scope, Config, params, dialogOptions) {
+
         //loading the formtabs + datas
         var ajaxConfig = service.prepareFormParams(Config, params);
         $http(ajaxConfig).success(function(response, status, header, config) {
