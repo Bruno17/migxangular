@@ -1442,15 +1442,15 @@ class MigxAngular {
     function parseChunk($tpl, $fields = array(), $getChunk = true, $printIfemty = true) {
 
         $output = '';
+        $templatesPath = $this->config['templatesPath'];
 
         if ($getChunk) {
             if ($chunk = $this->modx->getObject('modChunk', array('name' => $tpl), true)) {
                 $tpl = $chunk->getContent();
-            } elseif (file_exists($tpl)) {
-                $tpl = file_get_contents($tpl);
-            } elseif (file_exists($this->modx->getOption('base_path') . $tpl)) {
-
-                $tpl = file_get_contents($this->modx->getOption('base_path') . $tpl);
+            } elseif (file_exists(str_replace('{templates_path}',$templatesPath,$tpl))) {
+                $tpl = file_get_contents(str_replace('{templates_path}',$templatesPath,$tpl));
+            } elseif (file_exists($this->modx->getOption('base_path') . str_replace('{templates_path}',$templatesPath,$tpl))) {
+                $tpl = file_get_contents($this->modx->getOption('base_path') . str_replace('{templates_path}',$templatesPath,$tpl));
             } else {
                 $tpl = false;
             }

@@ -295,6 +295,9 @@ migxAngular.factory('UiDialog', ['$http', '$compile' , '$ekathuwa', '$rootScope'
 
 function toolbarCtrl($scope, $http, $sce, $ekathuwa, Config, UiDialog) {
     $scope.config = Config;
+    $scope.UiDialog = UiDialog;
+    $scope.http = $http;
+    
     $scope.onButtonClick = function(params) {
         
         var dialogOptions = {

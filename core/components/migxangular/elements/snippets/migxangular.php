@@ -4,20 +4,35 @@ $migxangular = $modx->getService('migxangular', 'MigxAngular', $modx->getOption(
 if (!($migxangular instanceof MigxAngular))
     return '';
 
-//Add needed js-files to the head
-
 $properties = array();
 //$properties['auth']=$_SESSION["modx.{$modx->context->get('key')}.user.token"];
 
+$mgr_userid = $modx->getLoginUserId('mgr');
+$mgr_logged = !empty($mgr_userid) ? true : false;
+
 
 $buttons = $modx->getOption('buttons', $scriptProperties, '');
+$field = $modx->getOption('field', $scriptProperties, '');
 
-if (!empty($buttons)) {
+$templatePath = '';
+
+if (!empty($field)) {
+    $properties['value'] = $modx->getOption('value', $scriptProperties, '');
+    if (!$mgr_logged){
+        return $properties['value'];
+    }
+    $properties['field'] = $field;
+    $properties['configs'] = $modx->getOption('configs', $scriptProperties, '');
+    $properties['resource_id'] = $modx->getOption('resource_id', $scriptProperties, $modx->resource->get('id'));
+    $properties['object_id'] = $modx->getOption('object_id', $scriptProperties, $modx->resource->get('id'));
+    $properties['wctx'] = $modx->getOption('wctx', $scriptProperties, $modx->resource->get('context_key'));
+    $templatePath = $modx->getOption('tpl',$scriptProperties, '{templates_path}web/inlineedit/inlineedit.tpl');
+
+} elseif (!empty($buttons)) {
     $buttons = $modx->fromJson($buttons);
 } else {
     $buttons = array(array('configs' => 'childstutorial', 'text' => 'Edit Resource ' . $modx->resource->get('id')));
 }
-
 
 
 $buttonsoutput = array();
@@ -25,14 +40,14 @@ if (!empty($buttons)) {
     if (is_array($buttons)) {
         foreach ($buttons as $button) {
             $permission = $modx->getOption('permission', $button, '');
-            if (!empty($permission)){
-                if ($modx->hasPermission($permission)){
-                    
-                }else{
+            if (!empty($permission)) {
+                if ($modx->hasPermission($permission)) {
+
+                } else {
                     continue;
                 }
-            } 
-            
+            }
+
             $prop['extraparams'] = '';
             $extraparams = $modx->getOption('extraparams', $button, '');
             if (is_array($extraparams) && count($extraparams) > 0) {
@@ -54,9 +69,10 @@ if (!empty($buttons)) {
             $prop['processaction'] = $modx->getOption('processaction', $button, '');
             $prop['win_title'] = $modx->getOption('win_title', $button, ''); //Todo: get it from configs
             $prop['handler'] = $modx->getOption('handler', $button, 'onButtonClick');
-            $templatePath = $migxangular->config['templatesPath'] . 'web/button.tpl';
+            $templatePath = $modx->getOption('button_tpl',$scriptProperties,'{templates_path}web/button.tpl');
             $buttonsoutput[] = $migxangular->parseChunk($templatePath, $prop);
         }
+        $templatePath = $modx->getOption('tpl',$scriptProperties,'{templates_path}web/toolbar.tpl');
     }
 }
 
@@ -66,6 +82,7 @@ $properties['auth'] = $_SESSION["modx.mgr.user.token"];
 $properties['resource_id'] = $modx->resource->get('id');
 $properties['wctx'] = $modx->getOption('wctx', $scriptProperties, $modx->resource->get('context_key'));
 $properties['request_uri'] = $_SERVER["REQUEST_URI"];
+$properties['toolbar_id'] = $modx->getOption('toolbar_id', $scriptProperties, 'ma-maintoolbar');
 
 /*
 $properties['buttons']= '
@@ -105,21 +122,21 @@ handler: this.onButtonClick
 ';
 */
 
-$templatePath = $migxangular->config['templatesPath'] . 'web/toolbar.tpl';
-$toolbar = $migxangular->parseChunk($templatePath, $properties);
+
+$output = $migxangular->parseChunk($templatePath, $properties);
 
 //$modx->regClientCSS('assets/components/migxangular/js/ext4/resources/css/ext-all.css');
 //$modx->regClientCSS('assets/components/migxangular/js/ext4/resources/css/ext-all-gray.css');
 //$modx->regClientCSS('assets/components/migxangular/css/reset.css');
 //$modx->regClientStartupScript('assets/components/migxangular/js/ext4/ext-all.js');
+$modx->regClientStartupScript('http://code.jquery.com/jquery-1.9.1.js');
 
 $modx->regClientCSS('http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css');
-$modx->regClientStartupScript('http://code.jquery.com/jquery-1.9.1.js');
 $modx->regClientStartupScript('http://code.jquery.com/ui/1.10.3/jquery-ui.js');
 
+$modx->regClientStartupScript('assets/components/migxangular/js/touch-punch/jquery.ui.touch-punch.min.js');
 
 //$modx->regClientStartupScript('assets/components/courtreservation/js/jquery-ui/i18n/jquery.ui.datepicker-de.js');
-
 
 //$modx->regClientStartupScript('assets/components/migxangular/js/angular.js');
 $modx->regClientStartupScript('https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js');
@@ -149,13 +166,20 @@ $modx->regClientCSS('assets/components/migxangular/css/migxangular.css');
 
 $scriptPath = $migxangular->config['templatesPath'] . 'web/app_js.tpl';
 $script = $migxangular->parseChunk($scriptPath, $properties);
-
 $script = '<script type="text/javascript" charset="utf-8">' . $script . '</script>';
-
 $modx->regClientStartupScript($script);
+
+$scriptPath = $migxangular->config['templatesPath'] . 'web/inlineedit/inlineedit_js.tpl';
+$script = $migxangular->parseChunk($scriptPath, $properties);
+$script = '<script type="text/javascript" charset="utf-8">' . $script . '</script>';
+$modx->regClientStartupScript($script);
+
+
 //directives
 //$modx->regClientStartupScript('assets/components/migxangular/js/directives/typeahead.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/directives/datetimepicker.js');
 $modx->regClientStartupScript('assets/components/migxangular/js/directives/sortable.js');
 
-return $toolbar;
+$modx->regClientStartupScript('assets/components/migxangular/js/ckeditor/ckeditor.js');
+
+return $output;
